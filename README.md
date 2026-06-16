@@ -1,5 +1,6 @@
 # FractalViewer
-🇬🇧 English
+## 🇬🇧 English
+
 An interactive fractal renderer in C. Featuring custom zooming, motion, coordinate rotation and dynamic iteration scaling powered by Raylib.
 
 🎮 Controls
@@ -19,7 +20,7 @@ C: Cycle through predefined Julia set shapes (Only affects Julia).
 R: Reset camera view, zoom, and rotation to default values.
 
 
-🇪🇸 Español
+## 🇪🇸 Español
 
 Un renderizador interactivo de fractales en C. Cuenta con zoom, movimiento, rotación de coordenadas personalizados y escalado dinámico de iteraciones impulsado por Raylib.
 
