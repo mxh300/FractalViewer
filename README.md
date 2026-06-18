@@ -19,6 +19,8 @@ C: Cycle through predefined Julia set shapes (Only affects Julia).
 
 R: Reset camera view, zoom, and rotation to default values.
 
+F11: Swaps between full screen and windowed.
+
 
 ## 🇪🇸 Español
 
@@ -39,3 +41,5 @@ N: Siguiente fractal (Alterna entre Mandelbrot, Barco Ardiente y Julia).
 C: Cambiar la forma del fractal de Julia (Alterna entre distintas variables matemáticas predefinidas).
 
 R: Restablecer la cámara, el zoom y la rotación a los valores por defecto.
+
+F11: Alterna entre pantalla completa y modo ventana.

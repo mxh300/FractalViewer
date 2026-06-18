@@ -20,6 +20,7 @@ typedef enum{
     MANDELBROT,
     BURNING_SHIP,
     JULIA,
+    MANDELBAR,
     TOTAL_FRACTALES
 }Fractal_t;
 
@@ -61,7 +62,7 @@ void mandelbrot(int N, int M, double zoom, double panx, double pany, int iters, 
                 iter++;
             }
 
-            if (iter < M) {
+            if (iter < iters) {
                 int color_idx = iter % 16;
                 Color pixelColor = { 
                     colors[color_idx][0], 
@@ -107,7 +108,7 @@ void burning_ship(int N, int M, double zoom, double panx, double pany, int iters
                 iter++;
             }
 
-            if (iter < M) {
+            if (iter < iters) {
                 int color_idx = iter % 16;
                 Color pixelColor = { 
                     colors[color_idx][0], 
@@ -173,6 +174,47 @@ void julia(int N, int M, double zoom, double panx, double pany, int iters, doubl
     }
 }
 
+void mandelbar(int N, int M, double zoom, double panx, double pany, int iters, double angulo){
+
+    for (int y = 0; y < M; y++) {
+        for (int x = 0; x < N; x++) {
+            double x0_base = (x / (double)N - 0.5f) * 3.5f / zoom + panx;
+            double y0_base = (y / (double)M - 0.5f) * 2.0f / zoom + pany;
+
+            // Ángulo de rotación
+            double cos_a = cos(angulo);
+            double sin_a = sin(angulo);
+
+            // Rotación
+            double x0 = x0_base * cos_a - y0_base * sin_a;
+            double y0 = x0_base * sin_a + y0_base * cos_a;
+
+            double zx = 0.0f, zy = 0.0f;
+            int iter = 0;
+            while (zx * zx + zy * zy < 4.0f && iter < iters) {
+                double temp = zx * zx - zy * zy + x0;
+                zy = -2.0f * zx * zy + y0;
+                zx = temp;
+                iter++;
+            }
+
+            if (iter < iters) {
+                int color_idx = iter % 16;
+                Color pixelColor = { 
+                    colors[color_idx][0], 
+                    colors[color_idx][1], 
+                    colors[color_idx][2], 
+                    255 // 255 es la opacidad máxima
+                };
+                
+                // Pintamos el píxel directamente en la ventana
+                DrawPixel(x, y, pixelColor);
+            }
+            // Si iter == M, no hacemos nada y dejamos que se vea el fondo negro
+        }
+    }
+}
+
 int main(void) {
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     // 1. Abres la ventana de 800x450 píxeles
@@ -215,12 +257,12 @@ int main(void) {
         if (IsKeyDown(KEY_Q)) angulo -= 0.05f;
         if (IsKeyDown(KEY_E)) angulo += 0.05f;
 
-        if (IsKeyDown(KEY_J)) {
+        if (IsKeyPressed(KEY_J)) {
             int totalValores = sizeof(valoresC) / sizeof(valoresC[0]);
             c_usada = (c_usada + 1) % totalValores;
         }
 
-        if (IsKeyDown(KEY_R)) {
+        if (IsKeyPressed(KEY_R)) {
             zoom = DEFAULT_ZOOM;
             panx = DEFAULT_PANX;
             pany = DEFAULT_PANY;
@@ -230,7 +272,7 @@ int main(void) {
             c_usada = 0;
         }
 
-        if (IsKeyDown(KEY_N))  {
+        if (IsKeyPressed(KEY_N))  {
             fractal = (fractal + 1) % TOTAL_FRACTALES;
 
             switch(fractal){
@@ -242,11 +284,17 @@ int main(void) {
                     break;
                 case BURNING_SHIP:
                     zoom = 0.8f;
-                    //panx = -1.75f;
-                    //pany = -0.04f;
+                    panx = DEFAULT_PANX;
+                    pany = DEFAULT_PANY;
                     angulo = 3.14f;
                     break;
                 case JULIA:
+                    zoom = DEFAULT_ZOOM;
+                    panx = DEFAULT_PANX;
+                    pany = DEFAULT_PANY;
+                    angulo = 0.0f;
+                    break;
+                case MANDELBAR:
                     zoom = DEFAULT_ZOOM;
                     panx = DEFAULT_PANX;
                     pany = DEFAULT_PANY;
@@ -280,6 +328,9 @@ int main(void) {
                     break;
                 case JULIA:
                     julia(N, M, zoom, panx, pany, iters, angulo, c_usada);
+                    break;
+                case MANDELBAR:
+                    mandelbar(N, M, zoom, panx, pany, iters, angulo);
                     break;
                 default:
                     break;
