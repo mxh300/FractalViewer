@@ -21,6 +21,7 @@ typedef enum{
     BURNING_SHIP,
     JULIA,
     MANDELBAR,
+    CELTIC,
     TOTAL_FRACTALES
 }Fractal_t;
 
@@ -215,6 +216,38 @@ void mandelbar(int N, int M, double zoom, double panx, double pany, int iters, d
     }
 }
 
+void celtic(int N, int M, double zoom, double panx, double pany, int iters, double angulo) {
+    for (int y = 0; y < M; y++) {
+        for (int x = 0; x < N; x++) {
+            double x0_base = (x / (double)N - 0.5) * 3.5 / zoom + panx;
+            double y0_base = (y / (double)M - 0.5) * 2.0 / zoom + pany;
+
+            double cos_a = cos(angulo);
+            double sin_a = sin(angulo);
+
+            double x0 = x0_base * cos_a - y0_base * sin_a;
+            double y0 = x0_base * sin_a + y0_base * cos_a;
+
+            double zx = 0.0, zy = 0.0;
+            int iter = 0;
+            while (zx * zx + zy * zy < 4.0 && iter < iters) {
+                // Aquí está la magia celta: valor absoluto (fabs) a la diferencia de cuadrados
+                double temp = fabs(zx * zx - zy * zy) + x0;
+                zy = 2.0 * zx * zy + y0;
+                zx = temp;
+                
+                iter++;
+            }
+
+            if (iter < iters) {
+                int color_idx = iter % 16;
+                Color pixelColor = { colors[color_idx][0], colors[color_idx][1], colors[color_idx][2], 255 };
+                DrawPixel(x, y, pixelColor);
+            }
+        }
+    }
+}
+
 int main(void) {
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     // 1. Abres la ventana de 800x450 píxeles
@@ -276,31 +309,17 @@ int main(void) {
             fractal = (fractal + 1) % TOTAL_FRACTALES;
 
             switch(fractal){
-                case MANDELBROT:
-                    zoom = DEFAULT_ZOOM;
-                    panx = DEFAULT_PANX;
-                    pany = DEFAULT_PANY;
-                    angulo = 0.0f;
-                    break;
                 case BURNING_SHIP:
                     zoom = 0.8f;
                     panx = DEFAULT_PANX;
                     pany = DEFAULT_PANY;
                     angulo = 3.14f;
                     break;
-                case JULIA:
-                    zoom = DEFAULT_ZOOM;
-                    panx = DEFAULT_PANX;
-                    pany = DEFAULT_PANY;
-                    angulo = 0.0f;
-                    break;
-                case MANDELBAR:
-                    zoom = DEFAULT_ZOOM;
-                    panx = DEFAULT_PANX;
-                    pany = DEFAULT_PANY;
-                    angulo = 0.0f;
-                    break;
                 default:
+                    zoom = DEFAULT_ZOOM;
+                    panx = DEFAULT_PANX;
+                    pany = DEFAULT_PANY;
+                    angulo = 0.0f;
                     break;
             }
         }
@@ -331,6 +350,9 @@ int main(void) {
                     break;
                 case MANDELBAR:
                     mandelbar(N, M, zoom, panx, pany, iters, angulo);
+                    break;
+                case CELTIC:
+                    celtic(N, M, zoom, panx, pany, iters, angulo);
                     break;
                 default:
                     break;
