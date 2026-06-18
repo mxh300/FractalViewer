@@ -1,8 +1,8 @@
 #include "raylib.h"
 #include <math.h>
 
-#define WIDTH 800
-#define HEIGHT 450
+#define WIDTH 1024
+#define HEIGHT 720
 #define DEFAULT_ZOOM 1.0f
 #define DEFAULT_PANX 0.0f
 #define DEFAULT_PANY 0.0f
@@ -29,10 +29,13 @@ typedef struct {
 } JuliaParams;
 
 JuliaParams valoresC[] = {
-    {-0.8, 0.156},       // El Dragón
-    {-0.70176, -0.3842}, // El Copo de Nieve
-    {-0.123, 0.745},     // El Conejo
-    {0.285, 0.01}        // Galaxia
+    {-0.8, 0.156},          // El Dragón
+    {-0.70176, -0.3842},    // El Copo de Nieve
+    {-0.123, 0.745},        // El Conejo
+    {0.285, 0.01},          // Galaxia
+    {-0.75, 0.0},           //El Dragón de San Marco
+    {-0.39054, -0.58679},   //El Disco de Siegel
+    {0.0, 1.0}              //La Dendrita
 };
 
 void mandelbrot(int N, int M, double zoom, double panx, double pany, int iters, double angulo){
@@ -171,11 +174,13 @@ void julia(int N, int M, double zoom, double panx, double pany, int iters, doubl
 }
 
 int main(void) {
+    SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     // 1. Abres la ventana de 800x450 píxeles
-    InitWindow(800, 450, "Mi Proyecto Secreto");
+    InitWindow(WIDTH, HEIGHT, "Fractal Viewer");
+    //ToggleFullscreen();
 
-    int N = WIDTH;
-    int M = HEIGHT;
+    int N = GetScreenWidth();
+    int M = GetScreenHeight();
     int iters = DEFAULT_ITERS;
     double zoom = DEFAULT_ZOOM;
     double panx = DEFAULT_PANX;
@@ -189,6 +194,14 @@ int main(void) {
 
     // 2. Bucle principal que mantiene la ventana abierta
     while (!WindowShouldClose()) {
+
+        if (IsKeyPressed(KEY_F11)) {
+            ToggleFullscreen();
+        }
+        //FUERA PQ ES RESIZABLE
+        N = GetScreenWidth();
+        M = GetScreenHeight();
+
         // 1. TECLADO: Mover la vista (usamos IsKeyDown para movimiento continuo)
         // Dividimos la velocidad entre el zoom para que al estar muy cerca no te muevas demasiado rápido
         if (IsKeyDown(KEY_D)) panx += desp / zoom;
@@ -202,7 +215,7 @@ int main(void) {
         if (IsKeyDown(KEY_Q)) angulo -= 0.05f;
         if (IsKeyDown(KEY_E)) angulo += 0.05f;
 
-        if (IsKeyDown(KEY_C)) {
+        if (IsKeyDown(KEY_J)) {
             int totalValores = sizeof(valoresC) / sizeof(valoresC[0]);
             c_usada = (c_usada + 1) % totalValores;
         }
@@ -214,6 +227,7 @@ int main(void) {
             desp = 0.05f;
             angulo = 0.0f;
             angulo = 0.0f;
+            c_usada = 0;
         }
 
         if (IsKeyDown(KEY_N))  {
@@ -252,7 +266,7 @@ int main(void) {
             if (zoom < 0.1f) zoom = 0.1f;
         }
 
-        int iters = 100 + (int)(20.0 * log10(zoom));
+        int iters = 70 + (int)(20.0 * log10(zoom));
         
         BeginDrawing();
             ClearBackground(BLACK); // Pintamos el fondo de negro
